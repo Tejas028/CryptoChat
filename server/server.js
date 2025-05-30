@@ -55,3 +55,6 @@ await connectDB()
 await connectCloudinary()
 
 server.listen(port, () => console.log("Server Started", port))
+
+
+module.exports = app;
