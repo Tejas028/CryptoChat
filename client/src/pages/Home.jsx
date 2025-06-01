@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ChatContext } from '../../context/ChatContext';
+import toast from 'react-hot-toast';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -66,11 +67,11 @@ const Home = () => {
 
     // }, [selectedUser])
 
-    useEffect(()=>{
-        if(isOpen){
-            sendVerificationCode(authUser.email, false)
+    useEffect(() => {
+        if (authUser?.email) {
+            sendVerificationCode(authUser.email, false);
         }
-    },[isOpen])
+    }, [authUser?.email]);
 
     const bgClass = darkMode
         ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white'
@@ -210,7 +211,7 @@ const Home = () => {
                                                             onClick={() => {
                                                                 navigator.clipboard.writeText(window.location.origin);
                                                                 // Add toast notification here if needed
-                                                                console.log('Link copied to clipboard!');
+                                                                toast('Link copied to clipboard!');
                                                             }}
                                                             className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
                                                         >
@@ -288,7 +289,7 @@ const Home = () => {
                                                             onClick={() => {
                                                                 navigator.clipboard.writeText(window.location.origin);
                                                                 // Add toast notification here if needed
-                                                                console.log('Link copied to clipboard!');
+                                                                toast('Link copied to clipboard!');
                                                             }}
                                                         >
                                                             <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [authUser, setAuthUser] = useState(null)
     const [onlineUsers, setOnlineUsers] = useState([])
     const [socket, setSocket] = useState(null)
-    const [passCode, setPassCode]=useState('')
+    const [passCode, setPassCode] = useState('')
     const [darkMode, setDarkMode] = useState(false);
 
     // Check if the user is authenticated and if so, set the user data and connect the socket
@@ -55,22 +55,25 @@ export const AuthProvider = ({ children }) => {
     const sendVerificationCode = async (email, bool) => {
         try {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            setPassCode(code)
+            setPassCode(code);
+
             const { data } = await axios.post('/api/auth/send-code', { email, bool, code });
-            if (data.success && bool) {
-                toast.success("Verification code sent to your email!");
-                return true
+
+            if (data.success) {
+                if(bool) toast.success("Verification code sent to your email!");
+                return true;
             } else {
-                toast.error(data.message);
+                toast.error(data.message || "Failed to send code.");
             }
         } catch (error) {
-            toast.error(error.message);
+            toast.error(error.response?.data?.message || error.message || "Unexpected error.");
         }
     };
 
+
     // Function to verify code
     const verifyCode = async (email, code) => {
-        try {            
+        try {
             const { data } = await axios.post('/api/auth/verify-code', { email, code })
             if (data.success) {
                 toast.success("Verification Successful")
