@@ -44,7 +44,18 @@ const Home = () => {
 
     useEffect(() => {
         getUsers();
-    }, [onlineUsers]);
+    }, []); // Only fetch users once on component mount
+
+    // OR if you need to periodically update users, use an interval:
+    useEffect(() => {
+        getUsers(); // Initial fetch
+
+        const interval = setInterval(() => {
+            getUsers();
+        }, 30000); // Update every 30 seconds
+
+        return () => clearInterval(interval);
+    }, []);
 
     // Click outside handlers
     useEffect(() => {
