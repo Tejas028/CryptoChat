@@ -27,18 +27,6 @@ const registerUser = async (req, res) => {
       return res.json({ success: false, message: "Invalid email!" })
     }
 
-    const isValid = validator.isStrongPassword(password, {
-      minLength: 8,
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1,
-      minSymbols: 1,
-    });
-
-    if (!isValid) {
-      return res.json({ success: false, message: "Enter a strong password!" })
-    }
-
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
@@ -102,6 +90,9 @@ export const sendVerificationCode = async (req, res) => {
     verified: false,
     isTemporary: !bool,
   };
+
+  console.log(verificationCodes);
+  
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -249,8 +240,9 @@ Instructions:
 // route: POST /api/auth/verify-code
 export const verifyCode = async (req, res) => {
   const { email, code } = req.body;
-
+  
   const record = verificationCodes[email?.toLowerCase()];
+  
   if (!record) return res.json({ success: false, message: "No code sent" });
 
   if (record.expiresAt < Date.now()) {
