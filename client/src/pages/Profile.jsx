@@ -8,7 +8,7 @@ const Profile = () => {
 
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false);
-  const email=useState(authUser.email)
+  const email = useState(authUser.email)
   const [selectedImage, setSelectedImage] = useState(null)
   const [name, setName] = useState(authUser.name)
   const [password, setPassword] = useState('')
@@ -17,7 +17,7 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await updateProfile({name, phone, password, bio})
+    await updateProfile({ name, phone, password, bio })
     return
   }
 
@@ -56,6 +56,12 @@ const Profile = () => {
           {/* Header with theme toggle */}
           <div className={`flex items-center justify-between px-4 py-4 border-b ${cardBorder}`}>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">Crypto Chat</h1>
+
+            <div className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${darkMode ? hoverBtnDark : hoverBtnLight}`} onClick={()=>navigate('/')}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
+            </div>
           </div>
 
           {/* Profile content */}
@@ -148,7 +154,7 @@ const Profile = () => {
                         placeholder="Enter new password"
                       />
                     </div>
-                  ) : '' }
+                  ) : ''}
                 </div>
 
                 {/* Bio field */}
@@ -170,7 +176,7 @@ const Profile = () => {
                 </div>
 
                 {/* Status field */}
-                <div>
+                {/* <div>
                   <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Status
                   </label>
@@ -187,7 +193,7 @@ const Profile = () => {
                       <p className="text-lg">Available</p>
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {/* Action buttons */}
                 <div className="flex gap-4 pt-6">

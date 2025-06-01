@@ -106,7 +106,15 @@ export const ChatProvider = ({ children }) => {
         socket.on("newMessage", (newMessage) => {
             if (selectedUser && newMessage.senderId === selectedUser._id) {
                 newMessage.seen = true
-                setMessages((prevMessages) => [...prevMessages, newMessage])
+                setunseenMessages((prev) => ({
+                    ...prev,
+                    [selectedUser._id]: 0
+                }));
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, newMessage];
+                    encryptMessages(updatedMessages)
+                    return updatedMessages
+                })
                 axios.put(`/api/messages/mark/${newMessage._id}`)
             } else {
                 setunseenMessages((prevUnseenMessages) => (

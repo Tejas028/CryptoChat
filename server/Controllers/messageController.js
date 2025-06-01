@@ -62,34 +62,40 @@ export const markMessageAsSeen = async (req, res) => {
 
 // Send message to selected user
 export const sendMessage = async (req, res) => {
-    try {
-        const { text, image } = req.body
-        const recieverId = req.params.id
-        const senderId = req.user._id
+  try {
+    const { text, image } = req.body;
+    const recieverId = req.params.id;
+    const senderId = req.user._id;
 
-        let imageUrl
-        if (image) {
-            const uploadResponse = await cloudinary.uploader.upload(image)
-            imageUrl = uploadResponse.secure_url
-        }
-
-        const newMessage = await messageModel.create({
-            senderId,
-            recieverId,
-            text,
-            image: imageUrl
-        })
-
-        const recieverSocketId = userSocketMap[recieverId]
-        if (recieverSocketId) {
-            io.to(recieverSocketId).emit("newMessage", newMessage)
-        }
-        // console.log(newMessage);
-
-        res.json({ success: true, newMessage })
-    } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message })
+    let imageUrl;
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
     }
-}
+
+    const newMessage = await messageModel.create({
+      senderId,
+      recieverId,
+      text,
+      image: imageUrl
+    });
+
+    const recieverSocketId = userSocketMap[recieverId];
+    const senderSocketId = userSocketMap[senderId];
+
+    // Emit to both users (sender and receiver)
+    if (recieverSocketId) {
+      io.to(recieverSocketId).emit("newMessage", newMessage);
+    }
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("newMessage", newMessage);
+    }
+
+    res.json({ success: true, newMessage });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 

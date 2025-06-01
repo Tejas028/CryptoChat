@@ -288,12 +288,17 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { image, name, phone, bio } = req.body;
+    const { image, name, phone, bio, password } = req.body;
     const userId = req.user._id;
     let updateUser;
 
     if (!image) {
-      updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio }, { new: true });
+      if (password) {
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password:hashedPassword }, { new: true });
+      }
+      updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password }, { new: true });
     } else {
       const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: 'image' });
       const imageURL = imageUpload.secure_url;
