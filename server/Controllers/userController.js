@@ -49,28 +49,27 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body
-    const user = await userModel.findOne({ email })
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email: email.toLowerCase() }); // ✅ normalize email
 
     if (!user) {
-      return res.json({ success: false, message: "User doesn't exist!" })
+      return res.json({ success: false, message: "Invalid email or password" }); // ✅ better message
     }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password); // ✅ added await
 
     if (isMatch) {
-      const token = generateToken(user._id)
-      res.json({ success: true, userData: user, token, message: "Login Successful" })
+      const token = generateToken(user._id);
+      res.json({ success: true, userData: user, token, message: "Login Successful" });
     } else {
-      res.json({ success: false, message: "Invalid Password!" })
+      res.json({ success: false, message: "Invalid email or password" });
     }
-
-
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message })
+    res.json({ success: false, message: error.message });
   }
-}
+};
+
 
 // route: POST /api/auth/send-code
 export const sendVerificationCode = async (req, res) => {
@@ -80,19 +79,18 @@ export const sendVerificationCode = async (req, res) => {
     return res.json({ success: false, message: "Invalid email" });
   }
 
-  const existingUser = await userModel.findOne({ email });
+  const existingUser = await userModel.findOne({ email: email.toLowerCase() });
   if (existingUser && bool) {
     return res.json({ success: false, message: "Account already exists" });
   }
 
+  const EXPIRY_MINUTES = 10;
   verificationCodes[email.toLowerCase()] = {
     code,
     verified: false,
     isTemporary: !bool,
+    expiresAt: Date.now() + EXPIRY_MINUTES * 60 * 1000, // ✅ FIXED
   };
-
-  console.log(verificationCodes);
-  
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -102,7 +100,7 @@ export const sendVerificationCode = async (req, res) => {
     },
   });
 
-  const emailContent = getUnifiedEmailContent(code, bool); // ✅ uses unified email content
+  const emailContent = getUnifiedEmailContent(code, bool);
 
   try {
     await transporter.sendMail({
@@ -122,6 +120,7 @@ export const sendVerificationCode = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to send email." });
   }
 };
+
 
 // Unified email content generator
 const getUnifiedEmailContent = (code, isWelcome = false) => {
@@ -240,9 +239,8 @@ Instructions:
 // route: POST /api/auth/verify-code
 export const verifyCode = async (req, res) => {
   const { email, code } = req.body;
-  
   const record = verificationCodes[email?.toLowerCase()];
-  
+
   if (!record) return res.json({ success: false, message: "No code sent" });
 
   if (record.expiresAt < Date.now()) {
@@ -253,11 +251,10 @@ export const verifyCode = async (req, res) => {
     return res.json({ success: false, message: "Invalid code" });
   }
 
-  // Mark as verified
   verificationCodes[email.toLowerCase()].verified = true;
-
   return res.json({ success: true, message: "Email verified" });
 };
+
 
 
 const checkAuth = async (req, res) => {
@@ -266,17 +263,15 @@ const checkAuth = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-
-    const { userId } = req.body
-    const userData = await userModel.findById({ userId }).select('-password')
-
-    res.json({ success: true, userData })
-
+    const { userId } = req.body;
+    const userData = await userModel.findById(userId).select('-password'); // ✅ fixed usage
+    res.json({ success: true, userData });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message })
+    res.json({ success: false, message: error.message });
   }
-}
+};
+
 
 const updateProfile = async (req, res) => {
   try {
@@ -286,27 +281,26 @@ const updateProfile = async (req, res) => {
 
     if (!image) {
       if (password) {
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password:hashedPassword }, { new: true });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password: hashedPassword }, { new: true });
+      } else {
+        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio }, { new: true });
       }
-      updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password }, { new: true });
     } else {
-      const imageUpload = await cloudinary.uploader.upload(image.path, { resource_type: 'image' });
+      const imageUpload = await cloudinary.uploader.upload(image, { resource_type: 'image' }); // ✅ base64 supported
       const imageURL = imageUpload.secure_url;
       updateUser = await userModel.findByIdAndUpdate(userId, { image: imageURL, name, phone, bio }, { new: true });
     }
 
-    // Return the existing token if no changes in payload
-    const token = req.headers.token; // the one user already has
-
+    const token = req.headers.token;
     res.json({ success: true, message: "Profile Updated!", user: updateUser, token });
-
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-}
+};
+
 
 
 export { registerUser, loginUser, getProfile, updateProfile, checkAuth }
