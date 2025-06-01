@@ -51,35 +51,62 @@ app.use(cors({
 }))
 
 // Routes
-app.get('/api/status', (req, res) => {
-  res.send('✅ API Working')
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚀 Chat App Backend API',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      status: '/api/status',
+      auth: '/api/auth',
+      messages: '/api/messages'
+    }
+  })
 })
+
+app.get('/api/status', (req, res) => {
+  console.log('📊 Health check requested')
+  res.json({
+    status: '✅ API Working',
+    timestamp: new Date().toISOString(),
+    uptime: `${Math.floor(process.uptime())} seconds`,
+    environment: process.env.NODE_ENV || 'development'
+  })
+})
+
 app.use('/api/auth', userRouter)
 app.use('/api/messages', messageRouter)
 
 // Connect to DB and Cloudinary
 try {
   await connectDB()
-  console.log('✅ Database connected')
+  console.log('✅ Database connected successfully')
 } catch (error) {
-  console.error('❌ Database connection failed:', error)
+  console.error('❌ Database connection failed:', error.message)
+  // Continue without DB - let the app start anyway
 }
 
 try {
   await connectCloudinary()
-  console.log('✅ Cloudinary connected')
+  console.log('✅ Cloudinary connected successfully')
 } catch (error) {
-  console.error('❌ Cloudinary connection failed:', error)
+  console.error('❌ Cloudinary connection failed:', error.message)
+  // Continue without Cloudinary - let the app start anyway
 }
 
 // Start the server
 const PORT = process.env.PORT || 5000
+console.log('🔧 Environment:', process.env.NODE_ENV || 'development')
+console.log('🌐 Frontend URL:', process.env.FRONTEND_URL || 'Not set (using *)')
+console.log('📡 Starting server on port:', PORT)
+
 server.listen(PORT, '0.0.0.0', (err) => {
   if (err) {
     console.error('❌ Failed to start server:', err)
     process.exit(1)
   }
-  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`🚀 Server running successfully on port ${PORT}`)
+  console.log(`🌍 Server accessible at: http://0.0.0.0:${PORT}`)
 })
 
 export default server
