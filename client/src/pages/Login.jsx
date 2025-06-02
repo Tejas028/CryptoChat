@@ -4,13 +4,11 @@ import toast from 'react-hot-toast';
 import validator from 'validator'
 
 const Login = () => {
-  const [state, setState] = useState('Sign Up');
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [code, setCode] = useState('')
-  const [secretKey, setSecretKey] = useState('')
   const [isDataSubmitted, setIsDataSubmitted] = useState(false)
   const [dispCode, setDispCode] = useState(false)
   const [verified, setVerified] = useState(false)
@@ -18,7 +16,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword]=useState(false)
 
-  const { login, sendVerificationCode, verifyCode, darkMode, setDarkMode } = useContext(AuthContext)
+  const { login, sendVerificationCode, verifyCode, darkMode, setDarkMode, state, setState } = useContext(AuthContext)
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -74,7 +72,7 @@ const Login = () => {
         setIsDataSubmitted(true);
       }
 
-      login('signup', { name, email, password, secretKey });
+      login('signup', { name, email, password });
     } else {
       toast.error("Verification failed! Try again.");
     }
@@ -263,16 +261,6 @@ const Login = () => {
                                 </svg>
                               )}
                             </button>
-                          </div>
-
-                        )}
-                        {state === 'Sign Up' && (
-                          <div>
-                            <input onChange={(e) => setSecretKey(e.target.value)} value={secretKey}
-                              type="text"
-                              placeholder="Enter secret key"
-                              className={`w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:ring-2 focus:outline-none backdrop-blur-sm ${inputStyle}`}
-                            />
                           </div>
                         )}
                       </div>

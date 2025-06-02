@@ -9,15 +9,16 @@ const Profile = () => {
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false);
   const email = useState(authUser.email)
-  const [selectedImage, setSelectedImage] = useState(null)
   const [name, setName] = useState(authUser.name)
   const [password, setPassword] = useState('')
   const [bio, setBio] = useState(authUser.bio)
   const [phone, setPhone] = useState(authUser.phone)
+  const [secretKey, setsecretKey] = useState('')
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await updateProfile({ name, phone, password, bio })
+    await updateProfile({ name, phone, password, bio, secretKey })
     return
   }
 
@@ -57,11 +58,21 @@ const Profile = () => {
           <div className={`flex items-center justify-between px-4 py-4 border-b ${cardBorder}`}>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">Crypto Chat</h1>
 
-            <div className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${darkMode ? hoverBtnDark : hoverBtnLight}`} onClick={()=>navigate('/')}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-              </svg>
+            <div className=' flex flex-row gap-4'>
+              <div title='User Guide' className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${darkMode ? hoverBtnDark : hoverBtnLight}`} onClick={() => navigate('/user-guide', { state: { from: 'profile' } })}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                </svg>
+
+              </div>
+
+              <div className={`p-2 rounded-lg transition-all duration-300 hover:scale-110 ${darkMode ? hoverBtnDark : hoverBtnLight}`} onClick={() => navigate('/')}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+              </div>
             </div>
+
           </div>
 
           {/* Profile content */}
@@ -140,18 +151,33 @@ const Profile = () => {
                   )}
                 </div>
 
-                {/* Phone Number */}
+                {/* Password */}
                 <div>
-
                   {isEdit ? (
                     <div>
                       <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                         Password
                       </label>
                       <input onChange={(e) => setPassword(e.target.value)} value={password}
-                        type="tel"
+                        type="password"
                         className={`w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:ring-2 focus:outline-none ${inputStyle}`}
                         placeholder="Enter new password"
+                      />
+                    </div>
+                  ) : ''}
+                </div>
+
+                {/* Secret Key */}
+                <div>
+                  {isEdit ? (
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Secret Key
+                      </label>
+                      <input onChange={(e) => setsecretKey(e.target.value)} value={secretKey}
+                        type="text"
+                        className={`w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:ring-2 focus:outline-none ${inputStyle}`}
+                        placeholder="Enter new secret key"
                       />
                     </div>
                   ) : ''}
@@ -175,26 +201,6 @@ const Profile = () => {
                   )}
                 </div>
 
-                {/* Status field */}
-                {/* <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Status
-                  </label>
-                  {isEdit ? (
-                    <select className={`w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:ring-2 focus:outline-none ${inputStyle}`}>
-                      <option value="available">Available</option>
-                      <option value="busy">Busy</option>
-                      <option value="away">Away</option>
-                      <option value="invisible">Invisible</option>
-                    </select>
-                  ) : (
-                    <div className="flex items-center gap-2 py-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <p className="text-lg">Available</p>
-                    </div>
-                  )}
-                </div> */}
-
                 {/* Action buttons */}
                 <div className="flex gap-4 pt-6">
 
@@ -213,7 +219,6 @@ const Profile = () => {
                         Edit Profile
                       </button>
                   }
-
 
                   {isEdit && (
                     <button

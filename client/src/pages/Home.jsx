@@ -40,6 +40,8 @@ const Home = () => {
             getMessages(selectedUser._id);
 
         }
+        console.log(authUser.secretKey);
+        
     }, [selectedUser]);
 
     useEffect(() => {
@@ -51,7 +53,7 @@ const Home = () => {
         getUsers(); // Initial fetch
 
         const interval = setInterval(() => {
-            getUsers();
+            getUsers();            
         }, 30000); // Update every 30 seconds
 
         return () => clearInterval(interval);

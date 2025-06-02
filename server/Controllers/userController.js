@@ -9,7 +9,7 @@ const verificationCodes = {}
 
 const registerUser = async (req, res) => {
 
-  const { name, email, password, secretKey } = req.body
+  const { name, email, password } = req.body
 
   try {
 
@@ -33,8 +33,7 @@ const registerUser = async (req, res) => {
     const userData = await userModel.create({
       name,
       email: email.toLowerCase(),
-      password: hashedPassword,
-      secretKey
+      password: hashedPassword
     });
 
     const token = generateToken(userData._id)
@@ -67,6 +66,32 @@ const loginUser = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
+  }
+};
+
+const setSecretKey = async (req, res) => {
+  try {
+    const { secretKey, email } = req.body;
+
+    if (!secretKey || !email) {
+      return res.status(400).json({ success: false, message: "Secret key and email are required." });
+    }
+
+    const user = await userModel.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    await userModel.updateOne(
+      { email: email.toLowerCase() },
+      { $set: { secretKey: secretKey } }
+    );
+
+    res.status(200).json({ success: true, message: "Secret key updated successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error. Please try again." });
   }
 };
 
@@ -120,7 +145,6 @@ export const sendVerificationCode = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to send email." });
   }
 };
-
 
 // Unified email content generator
 const getUnifiedEmailContent = (code, isWelcome = false) => {
@@ -255,8 +279,6 @@ export const verifyCode = async (req, res) => {
   return res.json({ success: true, message: "Email verified" });
 };
 
-
-
 const checkAuth = async (req, res) => {
   res.json({ success: true, user: req.user })
 }
@@ -275,7 +297,7 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { image, name, phone, bio, password } = req.body;
+    const { image, name, phone, bio, password, secretKey } = req.body;
     const userId = req.user._id;
     let updateUser;
 
@@ -283,9 +305,9 @@ const updateProfile = async (req, res) => {
       if (password) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password: hashedPassword }, { new: true });
+        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, password: hashedPassword, secretKey }, { new: true });
       } else {
-        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio }, { new: true });
+        updateUser = await userModel.findByIdAndUpdate(userId, { name, phone, bio, secretKey }, { new: true });
       }
     } else {
       const imageUpload = await cloudinary.uploader.upload(image, { resource_type: 'image' }); // ✅ base64 supported
@@ -303,4 +325,4 @@ const updateProfile = async (req, res) => {
 
 
 
-export { registerUser, loginUser, getProfile, updateProfile, checkAuth }
+export { registerUser, loginUser, getProfile, updateProfile, checkAuth, setSecretKey }

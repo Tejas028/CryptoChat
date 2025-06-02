@@ -5,16 +5,29 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import { Toaster } from 'react-hot-toast'
 import { AuthContext } from '../context/AuthContext'
+import UserGuide from './pages/UserGuide'
 
 const App = () => {
-  const { authUser } = useContext(AuthContext)
+  const { authUser, state } = useContext(AuthContext)
   return (
     <div >
       <Toaster />
       <Routes>
-        <Route path='/' element={authUser ? <Home /> : <Navigate to={'/login'}/>}></Route>
-        <Route path='/login' element={!authUser ? <Login /> : <Navigate to={'/'}/>}></Route>
-        <Route path='/profile' element={authUser ? <Profile /> : <Navigate to={'/login'}/>}></Route>
+        <Route path='/user-guide' element={<UserGuide/>}></Route>
+        <Route
+          path="/"
+          element={
+            authUser ? (
+              state === 'Sign Up' && localStorage.getItem('hasSeenUserGuide') !== 'true'
+                ? <UserGuide />
+                : <Home />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route path='/login' element={!authUser ? <Login /> : <Navigate to={'/'} />}></Route>
+        <Route path='/profile' element={authUser ? <Profile /> : <Navigate to={'/login'} />}></Route>
       </Routes>
     </div>
   )

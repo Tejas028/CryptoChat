@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [onlineUsers, setOnlineUsers] = useState([])
     const [socket, setSocket] = useState(null)
     const [passCode, setPassCode] = useState('')
+    const [state, setState] = useState('Sign Up');
     const [darkMode, setDarkMode] = useState(false);
 
     // Check if the user is authenticated and if so, set the user data and connect the socket
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
             const { data } = await axios.post('/api/auth/send-code', { email, bool, code });
 
             if (data.success) {
-                if(bool) toast.success("Verification code sent to your email!");
+                if (bool) toast.success("Verification code sent to your email!");
                 return true;
             } else {
                 toast.error(data.message || "Failed to send code.");
@@ -69,7 +70,6 @@ export const AuthProvider = ({ children }) => {
             toast.error(error.response?.data?.message || error.message || "Unexpected error.");
         }
     };
-
 
     // Function to verify code
     const verifyCode = async (email, code) => {
@@ -130,6 +130,26 @@ export const AuthProvider = ({ children }) => {
         })
     }
 
+    const setSecretKey = async (secretKey, email) => {
+        try {
+            const { data } = await axios.post('/api/auth/set-secret-key', {
+                secretKey,
+                email,
+            })
+
+            if (data.success) {
+                toast.success("Secret key set successfully!")
+            } else {
+                toast.error(data.message || "Failed to set secret key.")
+            }
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || error.message || "Something went wrong."
+            )
+        }
+    }
+
+
     useEffect(() => {
         if (token) {
             axios.defaults.headers.common["token"] = token;
@@ -148,7 +168,9 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         sendVerificationCode,
         verifyCode, passCode,
-        darkMode, setDarkMode
+        darkMode, setDarkMode,
+        state, setState,
+        setSecretKey
     }
 
     return (
