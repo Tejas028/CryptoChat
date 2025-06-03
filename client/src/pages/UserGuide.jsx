@@ -4,10 +4,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
 
-const UserGuide = ({ darkMode = false }) => {
+const UserGuide = () => {
     const navigate = useNavigate()
     const [page, setPage] = useState(1)
-    const { setState, setSecretKey, authUser, setUserGuideSeen } = useContext(AuthContext)
+    const { setState, setSecretKey, authUser, setUserGuideSeen, darkMode } = useContext(AuthContext)
     const [secretKey, setsecretKey] = useState('')
     const location = useLocation()
     const from = location.state?.from
@@ -102,32 +102,35 @@ const UserGuide = ({ darkMode = false }) => {
                                 In Crypto Chat, every message is protected using a custom encryption method. To <b>view decrypted messages</b>, you must include your secret key in the input field.
                                 <br /><br />
                                 To <b>decrypt a message</b>, type:<br />
-                                <code className="font-mono bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm break-all">YOUR_SECRET_KEY[Code]YOUR_SECRET_KEY[SPACE]</code><br /><br />
+                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEY[Code]YOUR_SECRET_KEY[SPACE]</code><br /><br />
                                 To <b>encrypt a message</b>, type:<br />
-                                <code className="font-mono bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm break-all">YOUR_SECRET_KEYlockYOUR_SECRET_KEY[SPACE]</code><br /><br />
-                                You will receive your personal secret key when you first log in. Only messages encrypted and decrypted with this key will be readable to you.
+                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEYlockYOUR_SECRET_KEY[SPACE]</code><br /><br />
+                                You will receive your personal code when you first log in. Only messages encrypted and decrypted with this key & code will be readable to you.
                             </p>
 
                             <div className={`p-3 sm:p-4 rounded-lg border ${cardBorder} ${darkMode ? 'bg-gray-700/50' : 'bg-blue-50/50'}`}>
                                 <div className="flex items-start gap-3">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1.5}
-                                        stroke="currentColor"
-                                        className={`w-5 h-5 mt-0.5 flex-shrink-0 ${iconColor}`}
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
-                                        />
-                                    </svg>
+
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Security Guarantee
-                                        </p>
+                                        <div className=' flex flex-row items-center justify-center gap-2'>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className={`w-5 h-5 mt-0.5 flex-shrink-0 ${iconColor}`}
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
+                                                />
+                                            </svg>
+                                            <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                Security Guarantee
+                                            </p>
+                                        </div>
                                         <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                             Your messages are end-to-end encrypted. Without the correct secret key, the content remains unreadable—ensuring complete privacy from unauthorized users.
                                         </p>
