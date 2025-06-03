@@ -39,9 +39,7 @@ const Home = () => {
         if (selectedUser) {
             getMessages(selectedUser._id);
 
-        }
-        console.log(authUser.secretKey);
-        
+        }        
     }, [selectedUser]);
 
     useEffect(() => {

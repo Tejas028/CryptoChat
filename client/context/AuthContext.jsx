@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     const setUserGuideSeen = async (email) => {
-        console.log('Calling setUserGuideSeen with', email); // ✅ check this
         try {
             const { data } = await axios.post('/api/auth/set-user-guide-seen', { email });
 

@@ -6,9 +6,15 @@ import Profile from './pages/Profile'
 import { Toaster } from 'react-hot-toast'
 import { AuthContext } from '../context/AuthContext'
 import UserGuide from './pages/UserGuide'
+import { useEffect } from 'react'
 
 const App = () => {
   const { authUser, state } = useContext(AuthContext)
+
+  // useEffect(()=>{
+  //   console.log(authUser.hasSeenUserGuide);
+    
+  // },[authUser])
   return (
     <div >
       <Toaster />

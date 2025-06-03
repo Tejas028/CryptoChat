@@ -167,19 +167,19 @@ const UserGuide = ({ darkMode = false }) => {
                                         className={`w-full px-4 py-3 rounded-lg border shadow-sm focus:ring-2 focus:outline-none transition-all duration-300 backdrop-blur-sm ${inputStyle}`}
                                     />
                                 </div>
-                                
+
                                 <div className={`p-4 rounded-lg border-l-4 ${darkMode ? 'bg-red-900/20 border-red-500/50' : 'bg-red-50 border-red-400'}`}>
                                     <p className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-700'} leading-relaxed`}>
                                         <span className="font-semibold">Important:</span> The secret key must be entered every time you want to unlock messages. Choose something memorable but secure!
                                     </p>
                                 </div>
-                                
-                                <button
+
+                                {/* <button
                                     onClick={() => setSecretKey(secretKey, authUser.email)}
                                     className={`w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] focus:ring-2 focus:outline-none ${buttonStyle}`}
                                 >
                                     Save Secret Key
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>
@@ -216,10 +216,10 @@ const UserGuide = ({ darkMode = false }) => {
                                         <React.Fragment key={step}>
                                             <div
                                                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 ${page === step
-                                                        ? buttonStyle.replace('shadow-lg', '') + ' scale-110'
-                                                        : page > step
-                                                            ? `${darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-blue-500 text-white'}`
-                                                            : `${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'}`
+                                                    ? buttonStyle.replace('shadow-lg', '') + ' scale-110'
+                                                    : page > step
+                                                        ? `${darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-blue-500 text-white'}`
+                                                        : `${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'}`
                                                     }`}
                                             >
                                                 {page > step ? '✓' : step}
@@ -227,8 +227,8 @@ const UserGuide = ({ darkMode = false }) => {
                                             {index < arr.length - 1 && (
                                                 <div
                                                     className={`w-8 sm:w-12 h-1 rounded transition-all duration-300 ${page > step
-                                                            ? `${darkMode ? 'bg-yellow-400' : 'bg-blue-500'}`
-                                                            : `${darkMode ? 'bg-gray-700' : 'bg-gray-300'}`
+                                                        ? `${darkMode ? 'bg-yellow-400' : 'bg-blue-500'}`
+                                                        : `${darkMode ? 'bg-gray-700' : 'bg-gray-300'}`
                                                         }`}
                                                 ></div>
                                             )}
@@ -276,11 +276,13 @@ const UserGuide = ({ darkMode = false }) => {
                                                 if (!secretKey) {
                                                     toast.error("Secret Key cannot be empty!")
                                                 } else {
+                                                    await setSecretKey(secretKey, authUser.email)
                                                     await setUserGuideSeen(authUser.email)
                                                     setState('Done')
                                                     navigate('/')
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 nextPage()
                                             }
                                         }
@@ -294,7 +296,7 @@ const UserGuide = ({ darkMode = false }) => {
                                         {
                                             from
                                                 ? page === 2 ? 'Finish' : 'Next'
-                                                : page === 3 ? 'Finish' : 'Next'
+                                                : page === 3 ? 'Finish & Set Secret Key' : 'Next'
                                         }
                                     </span>
                                     <ArrowRight className="w-4 h-4" />

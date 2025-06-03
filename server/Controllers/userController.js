@@ -103,6 +103,8 @@ export const setUserGuideSeen = async (req, res) => {
       { email: email.toLowerCase() },
       { $set: { hasSeenUserGuide: true } }
     );
+
+    res.json({ success: true, message: 'User guide status updated' });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
