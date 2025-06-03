@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     verificationCode: { type: String },
     verificationCodeExpiry: { type: Date },
     isVerified: { type: Boolean, default: false },
-    secretKey: { type:String }
+    secretKey: { type: String },
+    hasSeenUserGuide: { type: Boolean, default: false }
 }, { timestamps: true })
 
 const userModel = mongoose.models.user || new mongoose.model('user', userSchema)

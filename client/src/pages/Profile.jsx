@@ -96,7 +96,7 @@ const Profile = () => {
               <div className="flex justify-center mb-8">
                 <div className="relative">
                   <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                    JD
+                    {authUser.name.charAt(0).toUpperCase()}
                   </div>
                   {isEdit && (
                     <button className={`absolute -bottom-2 -right-2 p-2 rounded-full ${darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-blue-500 text-white'} shadow-lg hover:scale-110 transition-transform`}>

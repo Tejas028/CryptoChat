@@ -95,6 +95,19 @@ const setSecretKey = async (req, res) => {
   }
 };
 
+export const setUserGuideSeen = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    await userModel.updateOne(
+      { email: email.toLowerCase() },
+      { $set: { hasSeenUserGuide: true } }
+    );
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+}
 
 // route: POST /api/auth/send-code
 export const sendVerificationCode = async (req, res) => {

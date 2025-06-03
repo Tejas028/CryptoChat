@@ -18,7 +18,7 @@ const App = () => {
           path="/"
           element={
             authUser ? (
-              state === 'Sign Up' && localStorage.getItem('hasSeenUserGuide') !== 'true'
+              state === 'Sign Up' && authUser.hasSeenUserGuide !== true
                 ? <UserGuide />
                 : <Home />
             ) : (

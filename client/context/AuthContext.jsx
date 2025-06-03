@@ -52,6 +52,25 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const setUserGuideSeen = async (email) => {
+          console.log('Calling setUserGuideSeen with', email); // ✅ check this
+        try {
+            const { data } = await axios.post('/api/auth/set-user-guide-seen', { email });
+
+            if (data.success) {
+                console.log('User guide status updated successfully');
+                return true;
+            } else {
+                toast.error(data.message || 'Failed to update user guide status');
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+            return false;
+        }
+    };
+
+
     // Send Mail function
     const sendVerificationCode = async (email, bool) => {
         try {
@@ -149,7 +168,6 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-
     useEffect(() => {
         if (token) {
             axios.defaults.headers.common["token"] = token;
@@ -170,7 +188,8 @@ export const AuthProvider = ({ children }) => {
         verifyCode, passCode,
         darkMode, setDarkMode,
         state, setState,
-        setSecretKey
+        setSecretKey,
+        setUserGuideSeen
     }
 
     return (
