@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const setUserGuideSeen = async (email) => {
-          console.log('Calling setUserGuideSeen with', email); // ✅ check this
+        console.log('Calling setUserGuideSeen with', email); // ✅ check this
         try {
             const { data } = await axios.post('/api/auth/set-user-guide-seen', { email });
 
@@ -175,6 +175,12 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token]); // re-run whenever token changes
 
+    const markUserGuideAsSeen = () => {
+        setAuthUser(prev => ({
+            ...prev,
+            hasSeenUserGuide: true,
+        }));
+    };
 
     const value = {
         axios,
