@@ -2,68 +2,65 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import toast from "react-hot-toast";
 
-export const ChatContext = createContext()
+export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-
     const asciiKeyString = import.meta.env.VITE_REACT_APP_ASCII_KEY || '';
     const asciiKeyArray = asciiKeyString.split(',').map(Number);
 
-    const [messages, setMessages] = useState([])
-    const [users, setUsers] = useState([])
-    const [selectedUser, setSelectedUser] = useState(null)
-    const [unseenMessages, setunseenMessages] = useState({})
-    const [encryptedMessages, setEncryptedMessages] = useState([])
+    const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [unseenMessages, setunseenMessages] = useState({});
+    const [encryptedMessages, setEncryptedMessages] = useState([]);
 
-    const { socket, axios } = useContext(AuthContext)
+    const { socket, axios } = useContext(AuthContext);
 
-    // Function to get all users for sidebar
+    // Get all users
     const getUsers = async () => {
         try {
-            const { data } = await axios.get('/api/messages/users')
+            const { data } = await axios.get('/api/messages/users');
             if (data.success) {
-                setUsers(data.users)
-                setunseenMessages(data.unseenMessages)
+                setUsers(data.users);
+                setunseenMessages(data.unseenMessages);
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
-    }
+    };
 
-    // Function to get messages for selected users
+    // Get messages for selected user
     const getMessages = async (userId) => {
         try {
-            const { data } = await axios.get(`/api/messages/${userId}`)
+            const { data } = await axios.get(`/api/messages/${userId}`);
             if (data.success) {
-                setMessages(data.messages)
-                encryptMessages(data.messages)
+                setMessages(data.messages);
+                encryptMessages(data.messages);
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
-    }
+    };
 
-    // Function to send message to selected user
+    // Send a message to selected user
     const sendMessage = async (messageData) => {
         try {
-            const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData)
+            const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
             if (data.success) {
-                // Add the new message to messages
                 setMessages((prevMessages) => {
                     const newMessages = [...prevMessages, data.newMessage];
-                    // Update encryptedMessages based on the new messages
                     encryptMessages(newMessages);
                     return newMessages;
                 });
             } else {
-                toast.error(data.message)
+                toast.error(data.message);
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message);
         }
-    }
+    };
 
-
+    // Encrypt messages
     const encryptMessages = (normalMessages) => {
         const encrypted = normalMessages.map((message) => {
             const msg = message.text;
@@ -71,84 +68,81 @@ export const ChatProvider = ({ children }) => {
             let encryptedText = "";
 
             for (let j = 0; j < msgLen; j++) {
-                // Get the ASCII code of the current character
                 const asciiCode = msg.charCodeAt(j);
-                // console.log(asciiCode);
-
-                // Find the index in asciiKeyArray by shifting j by msgLen
-                // Use modulo to avoid overflow if needed
-                const keyIndex = (msg.charCodeAt(j) + msgLen) % asciiKeyArray.length;
-
-                // Map the character's ASCII code to a new character using asciiKeyArray
-                // For example: you could XOR asciiCode with asciiKeyArray[keyIndex] or just
-                // replace the ascii code with asciiKeyArray[keyIndex]
-                // Here, I'll replace with the asciiKeyArray value directly as a new char:
+                const keyIndex = (asciiCode + msgLen) % asciiKeyArray.length;
                 const encryptedChar = String.fromCharCode(asciiKeyArray[keyIndex]);
-
                 encryptedText += encryptedChar;
             }
 
-            // Return a new message object with encrypted text but same other props
-            return {
-                ...message,
-                text: encryptedText,
-            };
+            return { ...message, text: encryptedText };
         });
 
         setEncryptedMessages(encrypted);
     };
 
+    // Handle incoming messages via socket
+    const subscribeToMessages = () => {
+        if (!socket) return;
 
-    // Function to subscribe to messages for selected user
-    const subscribeToMessages = async () => {
-        if (!socket) return
-
-        socket.on("newMessage", (newMessage) => {
+        const handleNewMessage = (newMessage) => {
             if (selectedUser && newMessage.senderId === selectedUser._id) {
-                newMessage.seen = true
+                newMessage.seen = true;
+
                 setunseenMessages((prev) => ({
                     ...prev,
                     [selectedUser._id]: 0
                 }));
-                setMessages((prevMessages) => {
-                    const updatedMessages = [...prevMessages, newMessage];
-                    encryptMessages(updatedMessages)
-                    return updatedMessages
-                })
-                axios.put(`/api/messages/mark/${newMessage._id}`)
-            } else {
-                setunseenMessages((prevUnseenMessages) => (
-                    {
-                        ...prevUnseenMessages, [newMessage.senderId]:
-                            prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages[newMessage.senderId] + 1 : 1
-                    }
-                ))
-            }
-        })
-    }
 
-    // Function to unsubscribe from messages
-    const unsubscribeFromMessages = async () => {
-        if (socket) socket.off("newMessage")
-    }
+                setMessages((prevMessages) => {
+                    const alreadyExists = prevMessages.some(msg => msg._id === newMessage._id);
+                    if (alreadyExists) return prevMessages;
+
+                    const updatedMessages = [...prevMessages, newMessage];
+                    encryptMessages(updatedMessages);
+                    return updatedMessages;
+                });
+
+                axios.put(`/api/messages/mark/${newMessage._id}`);
+            } else {
+                setunseenMessages((prev) => ({
+                    ...prev,
+                    [newMessage.senderId]: prev[newMessage.senderId]
+                        ? prev[newMessage.senderId] + 1
+                        : 1
+                }));
+            }
+        };
+
+        socket.on("newMessage", handleNewMessage);
+
+        return () => {
+            socket.off("newMessage", handleNewMessage); // ✅ cleanup
+        };
+    };
 
     useEffect(() => {
-        subscribeToMessages()
-        return () => unsubscribeFromMessages
-    }, [socket, selectedUser])
+        const unsubscribe = subscribeToMessages();
+        return () => {
+            if (unsubscribe) unsubscribe(); // ✅ FIXED: actually call cleanup
+        };
+    }, [socket, selectedUser]);
 
     const value = {
-        messages, users,
+        messages,
+        users,
         selectedUser,
-        getUsers, getMessages,
-        sendMessage, setSelectedUser,
-        unseenMessages, setunseenMessages,
+        getUsers,
+        getMessages,
+        sendMessage,
+        setSelectedUser,
+        unseenMessages,
+        setunseenMessages,
         encryptedMessages
-    }
+    };
 
     return (
         <ChatContext.Provider value={value}>
             {children}
         </ChatContext.Provider>
-    )
-} 
+    );
+};
