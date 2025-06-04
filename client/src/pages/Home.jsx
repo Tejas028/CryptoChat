@@ -14,6 +14,9 @@ const Home = () => {
     const [msgInput, setMsgInput] = useState('');
     const bottomRef = useRef(null);
     const [isUnlocked, setIsUnlocked] = useState(false)
+    const [isUserScrolling, setIsUserScrolling] = useState(false);
+    const messagesContainerRef = useRef(null);
+    const scrollTimeoutRef = useRef(null);
 
     const { logout, onlineUsers, authUser, sendVerificationCode, passCode, darkMode, setDarkMode } = useContext(AuthContext);
     const { messages, sendMessage, getMessages, getUsers, users, setSelectedUser, selectedUser, unseenMessages, setunseenMessages, encryptedMessages } = useContext(ChatContext);
@@ -39,8 +42,13 @@ const Home = () => {
         if (selectedUser) {
             getMessages(selectedUser._id);
 
-        }        
+            // Scroll down after a small delay to ensure messages are rendered
+            setTimeout(() => {
+                bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
     }, [selectedUser]);
+
 
     useEffect(() => {
         getUsers();
@@ -51,7 +59,7 @@ const Home = () => {
         getUsers(); // Initial fetch
 
         const interval = setInterval(() => {
-            getUsers();            
+            getUsers();
         }, 30000); // Update every 30 seconds
 
         return () => clearInterval(interval);
@@ -83,6 +91,25 @@ const Home = () => {
             sendVerificationCode(authUser.email, false);
         }
     }, [authUser?.email]);
+
+    // useEffect(() => {
+    //     // Only auto-scroll if user isn't manually scrolling
+    //     if (!isUserScrolling && bottomRef.current) {
+    //         bottomRef.current.scrollIntoView({
+    //             behavior: 'smooth',
+    //             block: 'end'
+    //         });
+    //     }
+    // }, [messages, encryptedMessages, isUserScrolling]);
+
+    // Clean up timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const bgClass = darkMode
         ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white'
@@ -381,7 +408,7 @@ const Home = () => {
                             </div>
 
                             {/* Chat Area */}
-                            <div className={`flex-1 flex flex-col ${!isOpen ? 'hidden md:flex' : 'flex'}`}>
+                            <div className={`flex-1 flex flex-col min-h-0 h-[100dvh] ${!isOpen ? 'hidden md:flex' : 'flex'}`}>
                                 {!isOpen ? (
                                     <div className="flex-1 flex flex-col gap-5 items-center justify-center p-8">
                                         <div className="text-center">
@@ -415,15 +442,45 @@ const Home = () => {
                                                     {selectedUser.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-medium">{selectedUser.name}</h3>
+                                                    <h3 className="font-semibold text-base sm:text-lg truncate max-w-[200px]">
+                                                        {selectedUser.name}
+                                                    </h3>
                                                     <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                         {onlineUsers.includes(selectedUser._id) ? 'Online' : 'Offline'}
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            {/* Messages Area */}
-                                            <div className="flex-1 overflow-y-auto p-4">
+                                            {/* Messages Area - UPDATED WITH SCROLL FIX */}
+                                            <div
+                                                ref={messagesContainerRef}
+                                                className="flex-1 overflow-y-auto p-4"
+                                                onScroll={(e) => {
+                                                    const container = e.target;
+                                                    const { scrollTop, scrollHeight, clientHeight } = container;
+
+                                                    // Check if user is near the bottom (within 100px)
+                                                    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+
+                                                    // Set user scrolling state
+                                                    setIsUserScrolling(true);
+
+                                                    // Clear existing timeout
+                                                    if (scrollTimeoutRef.current) {
+                                                        clearTimeout(scrollTimeoutRef.current);
+                                                    }
+
+                                                    // Reset scrolling state after user stops scrolling
+                                                    scrollTimeoutRef.current = setTimeout(() => {
+                                                        setIsUserScrolling(false);
+                                                    }, 150);
+
+                                                    // If user scrolls to bottom, enable auto-scroll again
+                                                    if (isNearBottom) {
+                                                        setIsUserScrolling(false);
+                                                    }
+                                                }}
+                                            >
                                                 <div className="space-y-4">
                                                     {(isUnlocked ? messages : encryptedMessages).map((message, index) => (
                                                         <div key={message._id || index} className={`flex ${message.senderId === authUser._id ? 'justify-end' : 'justify-start'} mb-2`}>
@@ -443,14 +500,13 @@ const Home = () => {
 
                                             {/* Message Input */}
                                             <div className={`px-4 py-3 border-t ${cardBorder} shrink-0`}>
-                                                <form onSubmit={handleSendMessage} className={`flex items-center gap-2 border rounded-full px-4 py-2 ${searchBg}`}>
+                                                <form onSubmit={handleSendMessage} className={`flex items-center border rounded-full justify-center px-4 py-2 ${searchBg}`}>
                                                     <input
                                                         onChange={(e) => {
                                                             setMsgInput(e.target.value);
                                                             msgInput === `${authUser.secretKey}${passCode}${authUser.secretKey}` ? setIsUnlocked(true) : null;
                                                             msgInput === `${authUser.secretKey}lock${authUser.secretKey}` ? setIsUnlocked(false) : null;
-                                                        }
-                                                        }
+                                                        }}
                                                         value={msgInput}
                                                         className={`flex-1 bg-transparent border-none outline-none ${darkMode ? 'text-white placeholder-gray-400' : 'text-gray-800 placeholder-gray-500'}`}
                                                         placeholder="Type a message..."
@@ -470,12 +526,14 @@ const Home = () => {
                                     )
                                 )}
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default Home;
