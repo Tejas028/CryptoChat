@@ -408,7 +408,7 @@ const Home = () => {
                             </div>
 
                             {/* Chat Area */}
-                            <div className={`flex-1 flex flex-col min-h-0 h-[100dvh] ${!isOpen ? 'hidden md:flex' : 'flex'}`}>
+                            <div className={`flex-1 flex flex-col min-h-0 ${!isOpen ? 'hidden md:flex' : 'flex'}`}>
                                 {!isOpen ? (
                                     <div className="flex-1 flex flex-col gap-5 items-center justify-center p-8">
                                         <div className="text-center">
