@@ -32,6 +32,9 @@ const Home = () => {
         setMsgInput("");
     };
 
+    // Highlight a div on right click
+
+
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -80,27 +83,11 @@ const Home = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [profileDrop, addDrop]);
 
-    // useEffect(() => {
-    //     console.log(selectedUser);
-    //     console.log(encryptedMessages);
-
-    // }, [selectedUser])
-
     useEffect(() => {
         if (authUser?.email) {
             sendVerificationCode(authUser.email, false);
         }
     }, [authUser?.email]);
-
-    // useEffect(() => {
-    //     // Only auto-scroll if user isn't manually scrolling
-    //     if (!isUserScrolling && bottomRef.current) {
-    //         bottomRef.current.scrollIntoView({
-    //             behavior: 'smooth',
-    //             block: 'end'
-    //         });
-    //     }
-    // }, [messages, encryptedMessages, isUserScrolling]);
 
     // Clean up timeout on unmount
     useEffect(() => {
@@ -459,23 +446,18 @@ const Home = () => {
                                                     const container = e.target;
                                                     const { scrollTop, scrollHeight, clientHeight } = container;
 
-                                                    // Check if user is near the bottom (within 100px)
                                                     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
 
-                                                    // Set user scrolling state
                                                     setIsUserScrolling(true);
 
-                                                    // Clear existing timeout
                                                     if (scrollTimeoutRef.current) {
                                                         clearTimeout(scrollTimeoutRef.current);
                                                     }
 
-                                                    // Reset scrolling state after user stops scrolling
                                                     scrollTimeoutRef.current = setTimeout(() => {
                                                         setIsUserScrolling(false);
                                                     }, 150);
 
-                                                    // If user scrolls to bottom, enable auto-scroll again
                                                     if (isNearBottom) {
                                                         setIsUserScrolling(false);
                                                     }
@@ -483,14 +465,20 @@ const Home = () => {
                                             >
                                                 <div className="space-y-4">
                                                     {(isUnlocked ? messages : encryptedMessages).map((message, index) => (
-                                                        <div key={message._id || index} className={`flex ${message.senderId === authUser._id ? 'justify-end' : 'justify-start'} mb-2`}>
-                                                            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${message.senderId === authUser._id
+                                                        <div key={message._id || index} className={`flex ${message.senderId === authUser._id ? 'justify-end' : 'justify-start'} mb-2 relative`}>
+                                                            <div className={` flex gap-3 items-end justify-between max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${message.senderId === authUser._id
                                                                 ? 'bg-blue-500 text-white'
                                                                 : darkMode
                                                                     ? 'bg-gray-700 text-white'
                                                                     : 'bg-gray-200 text-gray-800'
                                                                 }`}>
                                                                 {message.text}
+                                                                <div className=' text-[9px] font-extralight'>
+                                                                    {new Date(message.createdAt).toLocaleTimeString(undefined, {
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit'
+                                                                    })}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     ))}
