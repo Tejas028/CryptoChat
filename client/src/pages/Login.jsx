@@ -14,7 +14,7 @@ const Login = () => {
   const [verified, setVerified] = useState(false)
   const [dispValidation, setDispValidation] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword]=useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const { login, sendVerificationCode, verifyCode, darkMode, setDarkMode, state, setState } = useContext(AuthContext)
 
@@ -46,9 +46,13 @@ const Login = () => {
     }
 
     if (state === 'Login') {
-      login('login', { email, password });
+      const success = await login('login', { email, password });
+      if (!success) {
+        toast.error("Login failed. Please check your credentials.");
+      }
       return;
     }
+
 
     const sent = await sendVerificationCode(email, true);
     if (sent) {

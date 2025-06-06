@@ -32,9 +32,6 @@ const Home = () => {
         setMsgInput("");
     };
 
-    // Highlight a div on right click
-
-
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -491,9 +488,14 @@ const Home = () => {
                                                 <form onSubmit={handleSendMessage} className={`flex items-center border rounded-full justify-center px-4 py-2 ${searchBg}`}>
                                                     <input
                                                         onChange={(e) => {
-                                                            setMsgInput(e.target.value);
-                                                            msgInput === `${authUser.secretKey}${passCode}${authUser.secretKey}` ? setIsUnlocked(true) : null;
-                                                            msgInput === `${authUser.secretKey}lock${authUser.secretKey}` ? setIsUnlocked(false) : null;
+                                                            const newValue = e.target.value;
+                                                            setMsgInput(newValue);
+
+                                                            if (newValue === `${authUser.secretKey}${passCode}${authUser.secretKey}`) {
+                                                                setIsUnlocked(true);
+                                                            } else if (newValue === `${authUser.secretKey}lock${authUser.secretKey}`) {
+                                                                setIsUnlocked(false);
+                                                            }
                                                         }}
                                                         value={msgInput}
                                                         className={`flex-1 bg-transparent border-none outline-none ${darkMode ? 'text-white placeholder-gray-400' : 'text-gray-800 placeholder-gray-500'}`}
