@@ -118,6 +118,7 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common["token"] = null
         toast.success("Logged Out Successfully!")
         socket.disconnect()
+        setState('Login')
     }
 
     // Update profile function to handle user profile updates
