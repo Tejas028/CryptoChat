@@ -81,7 +81,7 @@ const Home = () => {
     }, [profileDrop, addDrop]);
 
     useEffect(() => {
-        if (authUser?.email) {
+        if (authUser?.email && !localStorage.getItem("codeSentOnce")) {
             sendVerificationCode(authUser.email, false);
         }
     }, [authUser?.email]);
@@ -491,7 +491,7 @@ const Home = () => {
                                                             const newValue = e.target.value;
                                                             setMsgInput(newValue);
                                                             console.log(authUser.secretKey);
-                                                            
+
                                                             if (newValue === `${authUser.secretKey}${passCode}${authUser.secretKey}`) {
                                                                 setIsUnlocked(true);
                                                             } else if (newValue === `${authUser.secretKey}lock${authUser.secretKey}`) {

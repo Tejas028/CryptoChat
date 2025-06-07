@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
 
             if (data.success) {
                 if (bool) toast.success("Verification code sent to your email!");
+                if(!bool) localStorage.setItem("codeSentOnce", "true");
                 return true;
             } else {
                 toast.error(data.message || "Failed to send code.");
@@ -112,6 +113,7 @@ export const AuthProvider = ({ children }) => {
     // Logout function to handle user logout and socket disconnection
     const logout = async () => {
         localStorage.removeItem("token")
+        localStorage.removeItem("codeSentOnce")
         setToken(null)
         setAuthUser(null)
         setOnlineUsers([])
