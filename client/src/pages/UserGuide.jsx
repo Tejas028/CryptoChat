@@ -102,9 +102,9 @@ const UserGuide = () => {
                                 In Crypto Chat, every message is protected using a custom encryption method. To <b>view decrypted messages</b>, you must include your secret key in the input field.
                                 <br /><br />
                                 To <b>decrypt a message</b>, type:<br />
-                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEY[Code]YOUR_SECRET_KEY[SPACE]</code><br /><br />
+                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEY[Code]YOUR_SECRET_KEY</code><br /><br />
                                 To <b>encrypt a message</b>, type:<br />
-                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEYlockYOUR_SECRET_KEY[SPACE]</code><br /><br />
+                                <code className={`font-mono ${inputStyle} px-2 py-1 rounded text-xs sm:text-sm break-all`}>YOUR_SECRET_KEYlockYOUR_SECRET_KEY</code><br /><br />
                                 You will receive your personal code when you first log in. Only messages encrypted and decrypted with this key & code will be readable to you.
                             </p>
 

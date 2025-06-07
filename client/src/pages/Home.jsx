@@ -490,7 +490,8 @@ const Home = () => {
                                                         onChange={(e) => {
                                                             const newValue = e.target.value;
                                                             setMsgInput(newValue);
-
+                                                            console.log(authUser.secretKey);
+                                                            
                                                             if (newValue === `${authUser.secretKey}${passCode}${authUser.secretKey}`) {
                                                                 setIsUnlocked(true);
                                                             } else if (newValue === `${authUser.secretKey}lock${authUser.secretKey}`) {

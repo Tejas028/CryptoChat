@@ -159,6 +159,10 @@ export const AuthProvider = ({ children }) => {
             })
 
             if (data.success) {
+                setAuthUser(prev => ({
+                    ...prev,
+                    secretKey,
+                }));
                 toast.success("Secret key set successfully!")
             } else {
                 toast.error(data.message || "Failed to set secret key.")
