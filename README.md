@@ -33,7 +33,7 @@ Vite (for React frontend)
 
 **Clone the Repository**
 ```bash
-  git clone https://github.com/<your-username>/crypto-chat.git
+  git clone https://github.com/Tejas028/crypto-chat.git
   cd crypto-chat
 ```
 
