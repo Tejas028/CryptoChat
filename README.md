@@ -1,6 +1,7 @@
 
 # Crypto Chat
 
+
 Crypto Chat is a secure real-time messaging app with a dynamic modern user interface, live online status, and encrypted chats. It was developed using the MERN stack.  With the help of Vercel and Socket.IO, it guarantees quick and confidential device connection.
 
 ## Features
